@@ -7,18 +7,41 @@ import org.json.JSONObject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
 public class DataBaseSaverWithDates {
     private EntityManagerFactory entityManagerFactory;
 
     private EntityManager entityManager;
+
+    public void getFromDBByDate(String date){
+    entityManagerFactory = Persistence.createEntityManagerFactory("SaveUseDate");
+    entityManager = entityManagerFactory.createEntityManager();
+    Query query = entityManager.createQuery("SELECT u FROM USD u where u.date=:date");
+    query.setParameter("date", date);
+    USD usd = (USD) query.getSingleResult();
+        if(usd!=null)
+            System.out.println(usd);
+        else
+            System.out.println("No data " + date + " in database");
+    }
+
+    public void getAverageFromDB(){
+    entityManagerFactory = Persistence.createEntityManagerFactory("SaveUseDate");
+    entityManager = entityManagerFactory.createEntityManager();
+    Query query = entityManager.createQuery("select avg(usd.saleRate) FROM USD usd");
+    Double result = (Double) query.getSingleResult();
+
+    System.out.println("Average value = " + new DecimalFormat("0.000").format(result));
+    }
 
     public void saveToDBWithDates(String url) { //save currency not current day
         entityManagerFactory = Persistence.createEntityManagerFactory("SaveUseDate");
